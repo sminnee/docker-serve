@@ -6,13 +6,15 @@ class DockerLoader
 {
 
     private $projectPath = null;
+    private $options = null;
 
     /**
      * Create a new docker loader for the given project
      */
-    function __construct($projectPath)
+    function __construct($projectPath, $options = [])
     {
         $this->projectPath = $projectPath;
+        $this->options = $options;
     }
 
     /**
@@ -37,6 +39,19 @@ class DockerLoader
     }
 
     /**
+     * Return a new DockerLoader that provides a port mapping
+     */
+    function withPortMapping($remote, $local)
+    {
+        $options = $this->options;
+        if (!isset($options['portMappings'])) {
+            $options['portMappings'] = [];
+        }
+        $options['portMappings'][] = "$local:$remote";
+        return new DockerLoader($this->projectPath, $options);
+    }
+
+    /**
      * Pass execution through to the docker container
      */
     function passthru($command)
@@ -46,8 +61,15 @@ class DockerLoader
         $pathMap = escapeshellarg($this->projectPath . ':' . $workingPath);
         $imageName = $this->getDockerImageName();
 
+        $portMappings = "";
+        if ($this->options['portMappings']) {
+            foreach ($this->options['portMappings'] as $portMapping) {
+                $portMappings .= " -p " . escapeshellarg($portMapping);
+            }
+        }
+
         $remoteCommand = "bash -c " . escapeshellarg("cd " . escapeshellarg($workingPath) . "; " . $command);
-        $dockerCommand = "docker run -ti -v $pathMap $imageName $remoteCommand";
+        $dockerCommand = "docker run -ti -P$portMappings -v $pathMap $imageName $remoteCommand";
 
         echo "Calling $dockerCommand...\n";
 

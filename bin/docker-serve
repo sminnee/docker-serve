@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../src/bootstrap.php';
+require_once BASE_PATH . '/vendor/autoload.php';
+
+$loader = new SilverStripe\DockerServe\DockerLoader(BASE_PATH);
+
+// Find extra arguments to pass to the internal silverstripe-serve instance
+$options = getopt(null, [ 'hash:', 'bootstrap-file:' ]);
+$extraCommandOptions = "";
+if ($options) {
+    foreach($options as $k => $v) {
+        $extraCommandOptions .= " " . escapeshellarg("--$k=$v");
+    }
+}
+
+// To do: shift this logic to the loader
+$host = getenv('DOCKER_HOST');
+if($domain = parse_url($host, PHP_URL_HOST)) {
+    $host = $domain;
+}
+echo "Listening on http://$host:3000...\n";
+
+// To do: determine better way of initialising dependent services
+
+$loader
+    ->withPortMapping(80, 3000)
+    ->passthru('/etc/init.d/mysql start; vendor/bin/serve --host=0.0.0.0 --port=80' . $extraCommandOptions);

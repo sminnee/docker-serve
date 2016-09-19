@@ -11,5 +11,13 @@
     "psr-4": {
       "SilverStripe\\DockerServe\\": "src"
     }
+  },
+  "bin": [
+    "bin/docker-phpunit",
+    "bin/docker-serve"
+  ],
+  "require": {
+    "silverstripe/serve": "dev-master",
+    "phpunit/phpunit": ">=3.7.0"
   }
 }
