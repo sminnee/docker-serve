@@ -1,0 +1,15 @@
+{
+  "name": "silverstripe/docker-serve",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Sam Minnee",
+      "email": "sam@silverstripe.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "SilverStripe\\DockerServe\\": "src"
+    }
+  }
+}

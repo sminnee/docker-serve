@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../src/bootstrap.php';
+require_once BASE_PATH . '/vendor/autoload.php';
+
+$loader = new SilverStripe\DockerServe\DockerLoader(BASE_PATH);
+
+// To do: determine better way of initialising dependent services
+$loader->passthru('/etc/init.d/mysql start; vendor/bin/phpunit');
